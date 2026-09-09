@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ParkControl — Terminal Operacional de Estacionamento (Stripe-Grade)</title>
+  <title>ParkControl — Terminal Operacional de Estacionamento</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
@@ -11,371 +11,388 @@
 </head>
 <body>
 
-  <!-- 4-States Switcher Toolbar (Interactive Prototype Inspector) -->
-  <aside class="state-toolbar" aria-label="Controle de Estados da Interface">
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
     <div>
-      <strong style="color: #38bdf8;">IMPECCABLE AUDIT:</strong>
-      <span style="color: #94a3b8; margin-left: 6px;">Alterne entre os 4 estados de interface mapeados:</span>
+      <div class="sidebar-logo">
+        <div class="logo-badge">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <rect width="18" height="18" x="3" y="3" rx="4"/>
+            <path d="M9 17V7h4a3 3 0 0 1 0 6H9"/>
+          </svg>
+        </div>
+        <div>
+          <div style="font-weight: 800; font-size: 15px; letter-spacing: -0.02em;">PARKCONTROL</div>
+          <div style="font-size: 11px; color: #64748b;">Rotativo Privado</div>
+        </div>
+      </div>
+
+      <ul class="nav-menu">
+        <li><a class="nav-item active" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/></svg> Terminal Guarita</a></li>
+        <li><a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg> Mapa do Pátio</a></li>
+        <li><a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> Caixa & PDV</a></li>
+        <li><a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> Fechamento Turno</a></li>
+      </ul>
     </div>
-    <div class="state-controls">
-      <button class="state-pill active" onclick="setInterfaceState('normal')">🟢 Normal (Operacional)</button>
-      <button class="state-pill" onclick="setInterfaceState('loading')">⏳ Skeleton (Loading)</button>
-      <button class="state-pill" onclick="setInterfaceState('empty')">📭 Empty State</button>
-      <button class="state-pill" onclick="setInterfaceState('error')">⚠️ Estado de Erro / Alerta</button>
+
+    <div style="border-top: 1px solid #1e293b; padding-top: 14px; font-size: 11px; color: #64748b;">
+      <div>Operador: <strong style="color: #cbd5e1;">Carlos Eduardo</strong></div>
+      <div>Turno Tarde • Guarita 01</div>
     </div>
   </aside>
 
-  <!-- Top Navigation Header -->
-  <header class="app-header">
-    <div class="brand-wrapper">
-      <div class="brand-icon">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <rect width="18" height="18" x="3" y="3" rx="4"/>
-          <path d="M9 17V7h4a3 3 0 0 1 0 6H9"/>
-        </svg>
+  <!-- Main App Workspace -->
+  <div class="app-container">
+
+    <!-- Top App Header -->
+    <header class="top-header">
+      <div class="header-title-block">
+        <h1>Terminal de Operação & Guarita LPR</h1>
+        <p>Entrada rápida, leitura de placas e monitoramento de vagas em tempo real</p>
       </div>
-      <div>
-        <div class="brand-name">
-          ParkControl
-          <span class="badge-tag">Pátio Central</span>
+
+      <div class="live-badges-group">
+        <div class="kpi-box">
+          <span class="kpi-title">Ocupação do Pátio</span>
+          <span class="kpi-stat" style="color: #2563eb;">28 / 38 Vagas (73%)</span>
         </div>
-        <div style="font-size: 12px; color: var(--text-muted);">Terminal Guarita 01 • Operador: Carlos Eduardo</div>
-      </div>
-    </div>
-
-    <!-- Real-time Live Counters -->
-    <div class="header-stats">
-      <div class="stat-item">
-        <span class="stat-label">Taxa de Ocupação</span>
-        <span class="stat-value" style="color: #2563eb;">
-          <span id="stat-occupancy-text">73% (28/38)</span>
-        </span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-label">Faturamento Turno</span>
-        <span class="stat-value" style="color: #059669;">
-          R$ <span id="stat-revenue-text">1.845,50</span>
-        </span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-label">Cancela LPR</span>
-        <span class="stat-value" style="color: #059669;">
-          <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#059669; margin-right:4px;"></span>
-          ONLINE
-        </span>
-      </div>
-    </div>
-  </header>
-
-  <!-- Main Layout Area -->
-  <main class="main-wrapper">
-
-    <!-- Error Banner (Shown only in Error State) -->
-    <div id="state-error-banner" class="alert-banner" style="display: none;">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      <div>
-        <strong>Alerta de Operação:</strong> Câmera LPR da Entrada 02 offline. Abertura manual por digitação de placa ativada.
-      </div>
-    </div>
-
-    <!-- SPLIT-SCREEN CONTAINER -->
-    <div class="split-layout">
-
-      <!-- LEFT COLUMN: RAPID CHECK-IN & POS TERMINAL -->
-      <section class="card" aria-labelledby="terminal-title">
-        <div class="card-header">
-          <h2 id="terminal-title" class="card-title">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/></svg>
-            Entrada de Veículo
-          </h2>
-          <span style="font-size: 11px; font-weight: 700; color: #2563eb; background: #eff6ff; padding: 2px 8px; border-radius: 4px;">Atalho [F2]</span>
+        <div class="kpi-box">
+          <span class="kpi-title">Faturamento Hoje</span>
+          <span class="kpi-stat" style="color: #059669;">R$ 1.845,50</span>
         </div>
+        <div class="kpi-box">
+          <span class="kpi-title">Cancela Entrada</span>
+          <span class="kpi-stat" style="color: #059669; font-size: 13px;">
+            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#059669;"></span> ONLINE
+          </span>
+        </div>
+      </div>
+    </header>
 
-        <!-- Normal State Form Content -->
-        <div id="form-content-normal">
-          <!-- Mercosul License Plate -->
-          <div class="form-group">
-            <label for="plate-input" class="form-label">
-              <span>Placa do Veículo (Mercosul / Padrão)</span>
-              <span style="color: var(--brand-primary); font-size: 11px; font-weight: 700;">Leitura LPR Instantânea</span>
+    <!-- Split Content Area -->
+    <main class="main-workspace">
+      <div class="dashboard-split">
+
+        <!-- LEFT PANEL: FAST ENTRY FORM -->
+        <section class="card">
+          <div class="card-header">
+            <div class="card-heading">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/></svg>
+              Entrada de Veículo (Check-in)
+            </div>
+            <span style="font-size: 11px; font-weight: 700; color: #2563eb; background: #eff6ff; padding: 2px 8px; border-radius: 4px;">Atalho [F2]</span>
+          </div>
+
+          <!-- License Plate Mercosul Box -->
+          <div class="field-group">
+            <label class="field-label">
+              <span>Placa do Veículo (Mercosul / Antiga)</span>
+              <span style="color: #2563eb; font-weight: 700;">LPR Ativo</span>
             </label>
-            <div class="plate-card">
-              <div class="plate-header">
+            <div class="mercosul-widget">
+              <div class="mercosul-top">
                 <span>BRASIL</span>
                 <span style="font-size: 8px;">MERCOSUL</span>
               </div>
-              <div class="plate-body">
-                <input type="text" id="plate-input" class="plate-input" value="BRA2E19" maxlength="8" placeholder="ABC1D23" oninput="this.value = this.value.toUpperCase()">
+              <div class="mercosul-inner">
+                <input type="text" id="plate-field" class="mercosul-text-input" value="BRA2E19" maxlength="8" placeholder="ABC1D23" oninput="this.value = this.value.toUpperCase()">
               </div>
             </div>
           </div>
 
           <!-- Vehicle Category -->
-          <div class="form-group">
-            <label class="form-label">Categoria do Veículo</label>
-            <div class="vehicle-grid">
-              <button type="button" class="vehicle-btn active" onclick="setVehicleCategory(this, 'Carro', 15.00)">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="8" rx="2"/><circle cx="7" cy="19" r="2"/><circle cx="17" cy="19" r="2"/><path d="M5 11l2-5h10l2 5"/></svg>
+          <div class="field-group">
+            <label class="field-label">Categoria & Tarifa</label>
+            <div class="category-row">
+              <button type="button" class="cat-btn active" onclick="setCategory(this, 'Carro', 'R$ 15,00')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="8" rx="2"/><circle cx="7" cy="19" r="2"/><circle cx="17" cy="19" r="2"/><path d="M5 11l2-5h10l2 5"/></svg>
                 <span>Automóvel</span>
-                <small style="font-size: 10px; color: var(--text-muted);">R$ 15,00/1ªh</small>
+                <small>R$ 15,00/1ªh</small>
               </button>
-              <button type="button" class="vehicle-btn" onclick="setVehicleCategory(this, 'Moto', 8.00)">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="16" r="3"/><circle cx="19" cy="16" r="3"/><path d="M12 16l-3-6 4-3h4l2 4"/></svg>
+              <button type="button" class="cat-btn" onclick="setCategory(this, 'Moto', 'R$ 8,00')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="16" r="3"/><circle cx="19" cy="16" r="3"/><path d="M12 16l-3-6 4-3h4l2 4"/></svg>
                 <span>Motocicleta</span>
-                <small style="font-size: 10px; color: var(--text-muted);">R$ 8,00/1ªh</small>
+                <small>R$ 8,00/1ªh</small>
               </button>
-              <button type="button" class="vehicle-btn" onclick="setVehicleCategory(this, 'SUV', 20.00)">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="9" width="20" height="10" rx="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/><path d="M4 9l2-5h12l2 5"/></svg>
+              <button type="button" class="cat-btn" onclick="setCategory(this, 'SUV', 'R$ 20,00')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="9" width="20" height="10" rx="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/><path d="M4 9l2-5h12l2 5"/></svg>
                 <span>SUV / Pickup</span>
-                <small style="font-size: 10px; color: var(--text-muted);">R$ 20,00/1ªh</small>
+                <small>R$ 20,00/1ªh</small>
               </button>
             </div>
           </div>
 
-          <!-- Suggested Spot -->
-          <div class="form-group">
-            <label for="spot-assigned" class="form-label">
+          <!-- Spot Suggested -->
+          <div class="field-group">
+            <label class="field-label">
               <span>Vaga Sugerida (Sensor Inteligente)</span>
-              <span style="color: #059669; font-weight: 700;">Setor A (Térreo)</span>
+              <span style="color: #059669; font-weight: 700;">Térreo Coberto</span>
             </label>
             <div style="display: flex; gap: 8px;">
-              <input type="text" id="spot-assigned" class="form-control" value="A-04 (Coberta)" readonly style="font-weight: 700; color: #059669;">
-              <button type="button" class="btn btn-secondary" style="width: auto; padding: 0 16px;" onclick="cycleSpot()">Trocar</button>
+              <input type="text" id="spot-field" class="field-input" value="A-04 (Coberta)" readonly style="font-weight: 700; color: #059669;">
+              <button type="button" class="btn-submit" style="width: auto; background: #f1f5f9; color: #334155; box-shadow: none; border: 1px solid #cbd5e1; padding: 0 14px;" onclick="changeSpot()">Trocar</button>
             </div>
           </div>
 
-          <!-- Rate / Convenience Agreement -->
-          <div class="form-group">
-            <label for="rate-select" class="form-label">Tabela de Tarifa / Convênio</label>
-            <select id="rate-select" class="form-control">
-              <option value="padrao">Rotativo Padrão (15 min tolerância)</option>
-              <option value="mercado">Convênio Pão de Açúcar (2h Isento)</option>
-              <option value="academia">Convênio SmartFit (1h30 Isento)</option>
-              <option value="mensalista">Mensalista Credenciado (Livre)</option>
+          <!-- Convênio -->
+          <div class="field-group">
+            <label class="field-label">Tabela de Convênio</label>
+            <select class="field-select" id="rate-select">
+              <option value="padrao">Rotativo Padrão (15m de tolerância)</option>
+              <option value="supermercado">Convênio Supermercado (2h Isentas)</option>
+              <option value="smartfit">Convênio Academia SmartFit (1h30 Isenta)</option>
+              <option value="mensalista">Mensalista Credenciado (Acesso Livre)</option>
             </select>
           </div>
 
-          <!-- Action Button -->
-          <button type="button" class="btn btn-primary" onclick="confirmCheckin()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
-            Imprimir Ticket & Abrir Cancela
-            <span class="shortcut-badge">ENTER</span>
+          <!-- Submit Button -->
+          <button type="button" class="btn-submit" onclick="emitTicket()">
+            <span style="display: flex; align-items: center; gap: 8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+              Imprimir Ticket & Liberar Cancela
+            </span>
+            <span class="key-pill">ENTER</span>
           </button>
-        </div>
+        </section>
 
-        <!-- Skeleton Loading State Content -->
-        <div id="form-content-skeleton" style="display: none;">
-          <div class="skeleton-box" style="height: 120px; margin-bottom: 20px;"></div>
-          <div class="skeleton-box" style="height: 70px; margin-bottom: 20px;"></div>
-          <div class="skeleton-box" style="height: 44px; margin-bottom: 20px;"></div>
-          <div class="skeleton-box" style="height: 48px;"></div>
-        </div>
-
-        <!-- Empty State Content -->
-        <div id="form-content-empty" class="empty-state-box" style="display: none;">
-          <div class="empty-state-icon">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
-          </div>
-          <h3 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">Nenhum Veículo na Guarita</h3>
-          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Aguardando aproximação de veículo ou leitura do sensor LPR.</p>
-          <button class="btn btn-secondary" style="width: auto; margin: 0 auto;" onclick="setInterfaceState('normal')">Simular Chegada</button>
-        </div>
-      </section>
-
-      <!-- RIGHT COLUMN: 2D PARKING FLOOR MAP -->
-      <section class="card" aria-labelledby="map-title">
-        <div class="map-header">
-          <div>
-            <h2 id="map-title" class="card-title">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-              Mapa de Vagas em Tempo Real
-            </h2>
-            <div style="font-size: 12px; color: var(--text-muted);">Clique em qualquer vaga para inspecionar estadia ou realizar cobrança</div>
-          </div>
-
-          <div class="map-legend">
-            <div class="legend-tag"><div class="legend-pill" style="background: #059669;"></div> Livre (10)</div>
-            <div class="legend-tag"><div class="legend-pill" style="background: #dc2626;"></div> Ocupada (24)</div>
-            <div class="legend-tag"><div class="legend-pill" style="background: #d97706;"></div> Tolerância (2)</div>
-            <div class="legend-tag"><div class="legend-pill" style="background: #7c3aed;"></div> VIP (2)</div>
-          </div>
-        </div>
-
-        <!-- Normal State Grid -->
-        <div id="grid-content-normal">
-          <div style="font-size: 13px; font-weight: 700; color: var(--text-secondary); margin: 12px 0 8px;">Setor A — Térreo Coberto</div>
-          <div class="grid-spots">
-            <div class="spot-tile occupied" onclick="inspectSpot('A-01', 'RJG3B88', 'Corolla', '14:32', 'R$ 15,00')">
-              <div style="display: flex; justify-content: space-between;"><span class="spot-code">A-01</span><span class="spot-status-badge">Ocupada</span></div>
-              <div class="spot-plate-text">RJG3B88</div>
-              <div class="spot-subtext">14:32 • 48 min</div>
+        <!-- RIGHT PANEL: COMPLETE 38-SPOTS MATRIX & RECENT LOGS -->
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-heading">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                Pátio & Mapa de Vagas (38 Vagas Totais)
+              </div>
+              <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Clique em uma vaga para inspecionar estadia ou cobrança</div>
             </div>
 
-            <div class="spot-tile occupied" onclick="inspectSpot('A-02', 'PKG9921', 'Civic', '14:15', 'R$ 20,00')">
-              <div style="display: flex; justify-content: space-between;"><span class="spot-code">A-02</span><span class="spot-status-badge">Ocupada</span></div>
-              <div class="spot-plate-text">PKG9921</div>
-              <div class="spot-subtext">14:15 • 1h05</div>
-            </div>
-
-            <div class="spot-tile occupied" onclick="inspectSpot('A-03', 'HJU1234', 'Jeep Compass', '13:00', 'R$ 28,00')">
-              <div style="display: flex; justify-content: space-between;"><span class="spot-code">A-03</span><span class="spot-status-badge">Ocupada</span></div>
-              <div class="spot-plate-text">HJU1234</div>
-              <div class="spot-subtext">13:00 • 2h20</div>
-            </div>
-
-            <div class="spot-tile free" onclick="selectSpotDirectly('A-04')">
-              <div style="display: flex; justify-content: space-between;"><span class="spot-code">A-04</span><span class="spot-status-badge">Livre</span></div>
-              <div class="spot-plate-text" style="color: #059669;">LIVRE</div>
-              <div class="spot-subtext">Sensor Ativo</div>
-            </div>
-
-            <div class="spot-tile free" onclick="selectSpotDirectly('A-05')">
-              <div style="display: flex; justify-content: space-between;"><span class="spot-code">A-05</span><span class="spot-status-badge">Livre</span></div>
-              <div class="spot-plate-text" style="color: #059669;">LIVRE</div>
-              <div class="spot-subtext">Sensor Ativo</div>
-            </div>
-
-            <div class="spot-tile reserved" onclick="inspectSpot('A-06', 'ABC9988', 'Onix', '11:20', 'Pago')">
-              <div style="display: flex; justify-content: space-between;"><span class="spot-code">A-06</span><span class="spot-status-badge">Pago</span></div>
-              <div class="spot-plate-text">ABC9988</div>
-              <div class="spot-subtext">Saída em 12m</div>
+            <!-- Legend -->
+            <div style="display: flex; gap: 12px; font-size: 11px; font-weight: 700;">
+              <span style="color: #059669; display: flex; align-items: center; gap: 4px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #059669;"></span> Livres (10)</span>
+              <span style="color: #dc2626; display: flex; align-items: center; gap: 4px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #dc2626;"></span> Ocupadas (24)</span>
+              <span style="color: #d97706; display: flex; align-items: center; gap: 4px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #d97706;"></span> Saída (2)</span>
+              <span style="color: #7c3aed; display: flex; align-items: center; gap: 4px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #7c3aed;"></span> VIP (2)</span>
             </div>
           </div>
 
-          <div style="font-size: 13px; font-weight: 700; color: var(--text-secondary); margin: 20px 0 8px;">Setor M — Motocicletas</div>
-          <div class="grid-spots">
-            <div class="spot-tile occupied" onclick="inspectSpot('M-01', 'ABC4D56', 'Yamaha MT-03', '13:50', 'R$ 12,00')">
-              <div style="display: flex; justify-content: space-between;"><span class="spot-code">M-01</span><span class="spot-status-badge">Ocupada</span></div>
-              <div class="spot-plate-text">ABC4D56</div>
-              <div class="spot-subtext">13:50 • 1h30</div>
+          <!-- Occupancy Progress Bar -->
+          <div class="floor-progress-bar">
+            <div class="floor-progress-fill" style="width: 63%; background: #dc2626;" title="Ocupadas"></div>
+            <div class="floor-progress-fill" style="width: 5%; background: #d97706;" title="Tolerância"></div>
+            <div class="floor-progress-fill" style="width: 5%; background: #7c3aed;" title="VIP"></div>
+            <div class="floor-progress-fill" style="width: 27%; background: #059669;" title="Livres"></div>
+          </div>
+
+          <!-- 38 SPOTS GRID MATRIX (6x6 + 2) -->
+          <div class="spots-matrix">
+            <!-- Row 1 -->
+            <div class="spot-cell occupied" onclick="spotDetails('A-01', 'RJG3B88', 'Corolla', '14:32', 'R$ 15,00')">
+              <div class="cell-top"><span class="cell-code">A-01</span><span class="cell-tag">Ocupada</span></div>
+              <div class="cell-plate">RJG3B88</div>
+              <div class="cell-info">14:32 • 48m</div>
+            </div>
+            <div class="spot-cell occupied" onclick="spotDetails('A-02', 'PKG9921', 'Civic', '14:15', 'R$ 20,00')">
+              <div class="cell-top"><span class="cell-code">A-02</span><span class="cell-tag">Ocupada</span></div>
+              <div class="cell-plate">PKG9921</div>
+              <div class="cell-info">14:15 • 1h05</div>
+            </div>
+            <div class="spot-cell occupied" onclick="spotDetails('A-03', 'HJU1234', 'Compass', '13:00', 'R$ 28,00')">
+              <div class="cell-top"><span class="cell-code">A-03</span><span class="cell-tag">Ocupada</span></div>
+              <div class="cell-plate">HJU1234</div>
+              <div class="cell-info">13:00 • 2h20</div>
+            </div>
+            <div class="spot-cell free" onclick="selectSpot('A-04')">
+              <div class="cell-top"><span class="cell-code">A-04</span><span class="cell-tag">Livre</span></div>
+              <div class="cell-plate" style="color: #059669;">DISPONÍVEL</div>
+              <div class="cell-info">Sensor Ativo</div>
+            </div>
+            <div class="spot-cell free" onclick="selectSpot('A-05')">
+              <div class="cell-top"><span class="cell-code">A-05</span><span class="cell-tag">Livre</span></div>
+              <div class="cell-plate" style="color: #059669;">DISPONÍVEL</div>
+              <div class="cell-info">Sensor Ativo</div>
+            </div>
+            <div class="spot-cell reserved" onclick="spotDetails('A-06', 'ABC9988', 'Onix', '11:20', 'Pago')">
+              <div class="cell-top"><span class="cell-code">A-06</span><span class="cell-tag">Saída</span></div>
+              <div class="cell-plate">ABC9988</div>
+              <div class="cell-info">Tolerância 12m</div>
             </div>
 
-            <div class="spot-tile free" onclick="selectSpotDirectly('M-02')">
-              <div style="display: flex; justify-content: space-between;"><span class="spot-code">M-02</span><span class="spot-status-badge">Livre</span></div>
-              <div class="spot-plate-text" style="color: #059669;">LIVRE</div>
-              <div class="spot-subtext">Moto</div>
+            <!-- Row 2 -->
+            <div class="spot-cell occupied" onclick="spotDetails('B-01', 'KLE5510', 'T-Cross', '14:40', 'R$ 15,00')">
+              <div class="cell-top"><span class="cell-code">B-01</span><span class="cell-tag">Ocupada</span></div>
+              <div class="cell-plate">KLE5510</div>
+              <div class="cell-info">14:40 • 40m</div>
+            </div>
+            <div class="spot-cell occupied" onclick="spotDetails('B-02', 'OPI8823', 'HB20', '13:45', 'R$ 20,00')">
+              <div class="cell-top"><span class="cell-code">B-02</span><span class="cell-tag">Ocupada</span></div>
+              <div class="cell-plate">OPI8823</div>
+              <div class="cell-info">13:45 • 1h35</div>
+            </div>
+            <div class="spot-cell free" onclick="selectSpot('B-03')">
+              <div class="cell-top"><span class="cell-code">B-03</span><span class="cell-tag">Livre</span></div>
+              <div class="cell-plate" style="color: #059669;">DISPONÍVEL</div>
+              <div class="cell-info">Descoberta</div>
+            </div>
+            <div class="spot-cell occupied" onclick="spotDetails('B-04', 'QWE1290', 'Yaris', '14:10', 'R$ 20,00')">
+              <div class="cell-top"><span class="cell-code">B-04</span><span class="cell-tag">Ocupada</span></div>
+              <div class="cell-plate">QWE1290</div>
+              <div class="cell-info">14:10 • 1h10</div>
+            </div>
+            <div class="spot-cell free" onclick="selectSpot('B-05')">
+              <div class="cell-top"><span class="cell-code">B-05</span><span class="cell-tag">Livre</span></div>
+              <div class="cell-plate" style="color: #059669;">DISPONÍVEL</div>
+              <div class="cell-info">Descoberta</div>
+            </div>
+            <div class="spot-cell vip" onclick="spotDetails('C-01', 'DIR0001', 'BMW 320i', '08:00', 'Mensalista')">
+              <div class="cell-top"><span class="cell-code">C-01</span><span class="cell-tag">VIP</span></div>
+              <div class="cell-plate">DIR0001</div>
+              <div class="cell-info">Diretoria</div>
+            </div>
+
+            <!-- Row 3 (Motos) -->
+            <div class="spot-cell occupied" onclick="spotDetails('M-01', 'ABC4D56', 'Yamaha MT-03', '13:50', 'R$ 12,00')">
+              <div class="cell-top"><span class="cell-code">M-01</span><span class="cell-tag">Ocupada</span></div>
+              <div class="cell-plate">ABC4D56</div>
+              <div class="cell-info">Moto • 1h30</div>
+            </div>
+            <div class="spot-cell occupied" onclick="spotDetails('M-02', 'XYZ9900', 'Honda PCX', '14:20', 'R$ 8,00')">
+              <div class="cell-top"><span class="cell-code">M-02</span><span class="cell-tag">Ocupada</span></div>
+              <div class="cell-plate">XYZ9900</div>
+              <div class="cell-info">Moto • 1h00</div>
+            </div>
+            <div class="spot-cell free" onclick="selectSpot('M-03')">
+              <div class="cell-top"><span class="cell-code">M-03</span><span class="cell-tag">Livre</span></div>
+              <div class="cell-plate" style="color: #059669;">DISPONÍVEL</div>
+              <div class="cell-info">Moto</div>
+            </div>
+            <div class="spot-cell free" onclick="selectSpot('M-04')">
+              <div class="cell-top"><span class="cell-code">M-04</span><span class="cell-tag">Livre</span></div>
+              <div class="cell-plate" style="color: #059669;">DISPONÍVEL</div>
+              <div class="cell-info">Moto</div>
+            </div>
+            <div class="spot-cell free" onclick="selectSpot('M-05')">
+              <div class="cell-top"><span class="cell-code">M-05</span><span class="cell-tag">Livre</span></div>
+              <div class="cell-plate" style="color: #059669;">DISPONÍVEL</div>
+              <div class="cell-info">Moto</div>
+            </div>
+            <div class="spot-cell free" onclick="selectSpot('M-06')">
+              <div class="cell-top"><span class="cell-code">M-06</span><span class="cell-tag">Livre</span></div>
+              <div class="cell-plate" style="color: #059669;">DISPONÍVEL</div>
+              <div class="cell-info">Moto</div>
             </div>
           </div>
-        </div>
 
-        <!-- Skeleton Grid -->
-        <div id="grid-content-skeleton" class="grid-spots" style="display: none; margin-top: 16px;">
-          <div class="skeleton-box" style="height: 105px;"></div>
-          <div class="skeleton-box" style="height: 105px;"></div>
-          <div class="skeleton-box" style="height: 105px;"></div>
-          <div class="skeleton-box" style="height: 105px;"></div>
-          <div class="skeleton-box" style="height: 105px;"></div>
-          <div class="skeleton-box" style="height: 105px;"></div>
-        </div>
-
-        <!-- Empty Grid -->
-        <div id="grid-content-empty" class="empty-state-box" style="display: none;">
-          <div class="empty-state-icon">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/></svg>
+          <!-- Real-Time Activity Feed -->
+          <div style="margin-top: 24px;">
+            <div style="font-size: 13px; font-weight: 700; color: var(--text-primary); display: flex; justify-content: space-between; align-items: center;">
+              <span>Últimos Acessos da Cancela</span>
+              <span style="font-size: 11px; color: var(--text-muted);">Sincronização em Tempo Real</span>
+            </div>
+            <table class="activity-feed-table">
+              <thead>
+                <tr>
+                  <th>Placa</th>
+                  <th>Veículo</th>
+                  <th>Vaga</th>
+                  <th>Hora Entrada</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="gate-feed-body">
+                <tr>
+                  <td><strong style="color: #2563eb; font-family: monospace;">RJG3B88</strong></td>
+                  <td>Corolla Branco</td>
+                  <td><span style="background: #eff6ff; color: #2563eb; padding: 2px 6px; border-radius: 4px; font-weight: 700;">A-01</span></td>
+                  <td>14:32:10</td>
+                  <td><span style="color: #059669; font-weight: 600;">Estacionado</span></td>
+                </tr>
+                <tr>
+                  <td><strong style="color: #2563eb; font-family: monospace;">PKG9921</strong></td>
+                  <td>Civic Preto</td>
+                  <td><span style="background: #eff6ff; color: #2563eb; padding: 2px 6px; border-radius: 4px; font-weight: 700;">A-02</span></td>
+                  <td>14:15:00</td>
+                  <td><span style="color: #059669; font-weight: 600;">Estacionado</span></td>
+                </tr>
+                <tr>
+                  <td><strong style="color: #2563eb; font-family: monospace;">ABC4D56</strong></td>
+                  <td>Yamaha MT-03</td>
+                  <td><span style="background: #f5f3ff; color: #7c3aed; padding: 2px 6px; border-radius: 4px; font-weight: 700;">M-01</span></td>
+                  <td>13:50:22</td>
+                  <td><span style="color: #059669; font-weight: 600;">Estacionado</span></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <h3 style="font-size: 15px; font-weight: 700;">Estacionamento Vazio</h3>
-          <p style="font-size: 13px; color: var(--text-muted);">Todas as 38 vagas estão 100% disponíveis.</p>
-        </div>
-      </section>
+        </section>
 
-    </div>
-  </main>
+      </div>
+    </main>
+  </div>
 
-  <!-- Interactive Logic & Shortcuts -->
+  <!-- Interactive JavaScript -->
   <script>
-    // 4 Interface States Handler
-    function setInterfaceState(state) {
-      document.querySelectorAll('.state-pill').forEach(b => b.classList.remove('active'));
-      event.target.classList.add('active');
-
-      const normalForm = document.getElementById('form-content-normal');
-      const skeletonForm = document.getElementById('form-content-skeleton');
-      const emptyForm = document.getElementById('form-content-empty');
-
-      const normalGrid = document.getElementById('grid-content-normal');
-      const skeletonGrid = document.getElementById('grid-content-skeleton');
-      const emptyGrid = document.getElementById('grid-content-empty');
-
-      const errorBanner = document.getElementById('state-error-banner');
-
-      // Reset
-      normalForm.style.display = 'none';
-      skeletonForm.style.display = 'none';
-      emptyForm.style.display = 'none';
-
-      normalGrid.style.display = 'none';
-      skeletonGrid.style.display = 'none';
-      emptyGrid.style.display = 'none';
-      errorBanner.style.display = 'none';
-
-      if (state === 'normal') {
-        normalForm.style.display = 'block';
-        normalGrid.style.display = 'block';
-        showToast('🟢 Modo Operacional Normal Ativado');
-      } else if (state === 'loading') {
-        skeletonForm.style.display = 'block';
-        skeletonGrid.style.display = 'grid';
-        showToast('⏳ Estado de Loading com Skeletons Shimmer');
-      } else if (state === 'empty') {
-        emptyForm.style.display = 'block';
-        emptyGrid.style.display = 'block';
-        showToast('📭 Empty State Ilustrado Ativado');
-      } else if (state === 'error') {
-        normalForm.style.display = 'block';
-        normalGrid.style.display = 'block';
-        errorBanner.style.display = 'flex';
-        showToast('⚠️ Estado de Alerta/Erro Exibido');
-      }
+    function setCategory(btn, catName, rateText) {
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      triggerToast(`Categoria: ${catName} selecionada (${rateText}/1ªh)`);
     }
 
-    function setVehicleCategory(el, cat, rate) {
-      document.querySelectorAll('.vehicle-btn').forEach(b => b.classList.remove('active'));
-      el.classList.add('active');
-      showToast(`Categoria selecionada: ${cat}`);
+    function changeSpot() {
+      const freeSpots = ['A-04 (Coberta)', 'A-05 (Coberta)', 'B-03 (Descoberta)', 'B-05 (Descoberta)', 'M-03 (Moto)'];
+      const randomSpot = freeSpots[Math.floor(Math.random() * freeSpots.length)];
+      document.getElementById('spot-field').value = randomSpot;
+      triggerToast(`Vaga alterada para ${randomSpot}`);
     }
 
-    function cycleSpot() {
-      const spots = ['A-04 (Coberta)', 'A-05 (Coberta)', 'B-01 (Descoberta)', 'M-02 (Moto)'];
-      const pick = spots[Math.floor(Math.random() * spots.length)];
-      document.getElementById('spot-assigned').value = pick;
-      showToast(`Nova vaga atribuída: ${pick}`);
+    function selectSpot(spotCode) {
+      document.getElementById('spot-field').value = `${spotCode} (Selecionada no Mapa)`;
+      triggerToast(`Vaga ${spotCode} selecionada para o veículo na entrada!`);
+      document.getElementById('plate-field').focus();
     }
 
-    function selectSpotDirectly(spot) {
-      document.getElementById('spot-assigned').value = `${spot} (Selecionada no Mapa)`;
-      showToast(`Vaga ${spot} selecionada para o veículo na guarita.`);
+    function spotDetails(code, plate, model, time, bill) {
+      triggerToast(`Vaga ${code}: ${plate} (${model}) • Entrada: ${time} • Total: ${bill}`);
     }
 
-    function inspectSpot(spot, plate, model, time, bill) {
-      showToast(`Veículo ${plate} (${model}) na vaga ${spot}. Entrada: ${time} • Total: ${bill}`);
+    function emitTicket() {
+      const plate = document.getElementById('plate-field').value || 'BRA2E19';
+      const spot = document.getElementById('spot-field').value.split(' ')[0];
+      const now = new Date().toLocaleTimeString('pt-BR');
+
+      const tbody = document.getElementById('gate-feed-body');
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td><strong style="color: #2563eb; font-family: monospace;">${plate}</strong></td>
+        <td>Automóvel</td>
+        <td><span style="background: #eff6ff; color: #2563eb; padding: 2px 6px; border-radius: 4px; font-weight: 700;">${spot}</span></td>
+        <td>${now}</td>
+        <td><span style="color: #059669; font-weight: 600;">Entrada Liberada</span></td>
+      `;
+      tbody.prepend(row);
+
+      triggerToast(`✅ Ticket emitido para ${plate} na vaga ${spot}! Cancela de entrada aberta.`);
     }
 
-    function confirmCheckin() {
-      const plate = document.getElementById('plate-input').value || 'ABC1D23';
-      const spot = document.getElementById('spot-assigned').value.split(' ')[0];
-      showToast(`✅ Ticket emitido para ${plate} na vaga ${spot}! Cancela liberada.`);
-    }
-
-    // Keyboard Shortcuts (F2 / Enter)
+    // Keyboard Shortcuts
     window.addEventListener('keydown', (e) => {
       if (e.key === 'F2') {
         e.preventDefault();
-        document.getElementById('plate-input').focus();
-        showToast('Atalho [F2]: Foco no campo de placa');
-      } else if (e.key === 'Enter' && document.activeElement === document.getElementById('plate-input')) {
-        confirmCheckin();
+        document.getElementById('plate-field').focus();
+        triggerToast('Atalho [F2]: Digitação de Placa');
+      } else if (e.key === 'Enter' && document.activeElement === document.getElementById('plate-field')) {
+        emitTicket();
       }
     });
 
-    function showToast(msg) {
-      const existing = document.querySelector('.toast-box');
-      if (existing) existing.remove();
+    function triggerToast(text) {
+      const old = document.querySelector('.toast-alert');
+      if (old) old.remove();
 
       const toast = document.createElement('div');
-      toast.className = 'toast-box';
+      toast.className = 'toast-alert';
       toast.innerHTML = `
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        <span>${msg}</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>${text}</span>
       `;
       document.body.appendChild(toast);
 
