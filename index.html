@@ -3,101 +3,109 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ParkControl — Gestão de Estacionamento Rotativo Privado</title>
+  <title>ParkControl — Terminal Operacional de Estacionamento (Stripe-Grade)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-  <!-- Top Header -->
-  <header class="header">
-    <div class="brand-container">
-      <div class="brand-logo">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- 4-States Switcher Toolbar (Interactive Prototype Inspector) -->
+  <aside class="state-toolbar" aria-label="Controle de Estados da Interface">
+    <div>
+      <strong style="color: #38bdf8;">IMPECCABLE AUDIT:</strong>
+      <span style="color: #94a3b8; margin-left: 6px;">Alterne entre os 4 estados de interface mapeados:</span>
+    </div>
+    <div class="state-controls">
+      <button class="state-pill active" onclick="setInterfaceState('normal')">🟢 Normal (Operacional)</button>
+      <button class="state-pill" onclick="setInterfaceState('loading')">⏳ Skeleton (Loading)</button>
+      <button class="state-pill" onclick="setInterfaceState('empty')">📭 Empty State</button>
+      <button class="state-pill" onclick="setInterfaceState('error')">⚠️ Estado de Erro / Alerta</button>
+    </div>
+  </aside>
+
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="brand-wrapper">
+      <div class="brand-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <rect width="18" height="18" x="3" y="3" rx="4"/>
           <path d="M9 17V7h4a3 3 0 0 1 0 6H9"/>
         </svg>
       </div>
       <div>
-        <div class="brand-title">
-          PARKCONTROL
-          <span class="brand-badge">Rotativo Privado</span>
+        <div class="brand-name">
+          ParkControl
+          <span class="badge-tag">Pátio Central</span>
         </div>
+        <div style="font-size: 12px; color: var(--text-muted);">Terminal Guarita 01 • Operador: Carlos Eduardo</div>
       </div>
     </div>
 
-    <!-- Live Status Ribbons -->
-    <div class="kpi-ribbon">
-      <div class="kpi-item">
-        <span class="kpi-label">Ocupação Atual</span>
-        <span class="kpi-value" style="color: #38bdf8;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/></svg>
-          <span id="header-occupancy">28 / 38 Vagas (73%)</span>
+    <!-- Real-time Live Counters -->
+    <div class="header-stats">
+      <div class="stat-item">
+        <span class="stat-label">Taxa de Ocupação</span>
+        <span class="stat-value" style="color: #2563eb;">
+          <span id="stat-occupancy-text">73% (28/38)</span>
         </span>
       </div>
-      <div class="kpi-item">
-        <span class="kpi-label">Faturamento do Turno</span>
-        <span class="kpi-value" style="color: #10b981;">
-          R$ <span id="header-revenue">1.845,50</span>
+      <div class="stat-item">
+        <span class="stat-label">Faturamento Turno</span>
+        <span class="stat-value" style="color: #059669;">
+          R$ <span id="stat-revenue-text">1.845,50</span>
         </span>
       </div>
-      <div class="kpi-item">
-        <span class="kpi-label">Cancela Entrada</span>
-        <span class="kpi-value" style="color: #10b981;">
-          <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#10b981; margin-right:4px;"></span> ONLINE
+      <div class="stat-item">
+        <span class="stat-label">Cancela LPR</span>
+        <span class="stat-value" style="color: #059669;">
+          <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#059669; margin-right:4px;"></span>
+          ONLINE
         </span>
       </div>
     </div>
   </header>
 
-  <!-- Navigation Tabs -->
-  <nav class="nav-tabs">
-    <button class="tab-btn active" onclick="switchTab('checkin')">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-      01. Guarita & Entrada (LPR)
-    </button>
-    <button class="tab-btn" onclick="switchTab('floor-map')">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-      02. Mapa de Vagas em Tempo Real
-    </button>
-    <button class="tab-btn" onclick="switchTab('checkout')">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-      03. Caixa & Check-out Rápido
-    </button>
-    <button class="tab-btn" onclick="switchTab('reports')">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-      04. Métricas & Fechamento de Caixa
-    </button>
-  </nav>
+  <!-- Main Layout Area -->
+  <main class="main-wrapper">
 
-  <!-- Main Content -->
-  <main class="main-content">
+    <!-- Error Banner (Shown only in Error State) -->
+    <div id="state-error-banner" class="alert-banner" style="display: none;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div>
+        <strong>Alerta de Operação:</strong> Câmera LPR da Entrada 02 offline. Abertura manual por digitação de placa ativada.
+      </div>
+    </div>
 
-    <!-- TAB 1: CHECK-IN & ENTRADA -->
-    <section id="view-checkin" class="view-section active">
-      <div class="grid-2col">
-        <!-- Input Form -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/></svg>
-              Entrada de Veículo (Guarita 01)
-            </div>
-            <span class="spot-tag" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">LPR Ativo</span>
-          </div>
+    <!-- SPLIT-SCREEN CONTAINER -->
+    <div class="split-layout">
 
-          <!-- Mercosul Plate Input -->
+      <!-- LEFT COLUMN: RAPID CHECK-IN & POS TERMINAL -->
+      <section class="card" aria-labelledby="terminal-title">
+        <div class="card-header">
+          <h2 id="terminal-title" class="card-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/></svg>
+            Entrada de Veículo
+          </h2>
+          <span style="font-size: 11px; font-weight: 700; color: #2563eb; background: #eff6ff; padding: 2px 8px; border-radius: 4px;">Atalho [F2]</span>
+        </div>
+
+        <!-- Normal State Form Content -->
+        <div id="form-content-normal">
+          <!-- Mercosul License Plate -->
           <div class="form-group">
-            <label class="form-label" style="text-align: center;">Placa do Veículo (Mercosul / Padrão)</label>
-            <div class="mercosul-plate-box">
-              <div class="mercosul-header">
+            <label for="plate-input" class="form-label">
+              <span>Placa do Veículo (Mercosul / Padrão)</span>
+              <span style="color: var(--brand-primary); font-size: 11px; font-weight: 700;">Leitura LPR Instantânea</span>
+            </label>
+            <div class="plate-card">
+              <div class="plate-header">
                 <span>BRASIL</span>
                 <span style="font-size: 8px;">MERCOSUL</span>
               </div>
-              <div class="mercosul-body">
-                <input type="text" id="input-plate" class="mercosul-input" value="BRA2E19" maxlength="8" placeholder="ABC1D23" oninput="this.value = this.value.toUpperCase()">
+              <div class="plate-body">
+                <input type="text" id="plate-input" class="plate-input" value="BRA2E19" maxlength="8" placeholder="ABC1D23" oninput="this.value = this.value.toUpperCase()">
               </div>
             </div>
           </div>
@@ -105,414 +113,273 @@
           <!-- Vehicle Category -->
           <div class="form-group">
             <label class="form-label">Categoria do Veículo</label>
-            <div class="vehicle-type-selector">
-              <div class="vehicle-type-btn active" onclick="setVehicleType(this, 'Carro', 'R$ 15,00 / 1ª h')">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="8" rx="2"/><circle cx="7" cy="19" r="2"/><circle cx="17" cy="19" r="2"/><path d="M5 11l2-5h10l2 5"/></svg>
+            <div class="vehicle-grid">
+              <button type="button" class="vehicle-btn active" onclick="setVehicleCategory(this, 'Carro', 15.00)">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="8" rx="2"/><circle cx="7" cy="19" r="2"/><circle cx="17" cy="19" r="2"/><path d="M5 11l2-5h10l2 5"/></svg>
                 <span>Automóvel</span>
-              </div>
-              <div class="vehicle-type-btn" onclick="setVehicleType(this, 'Moto', 'R$ 8,00 / 1ª h')">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="16" r="3"/><circle cx="19" cy="16" r="3"/><path d="M12 16l-3-6 4-3h4l2 4"/></svg>
+                <small style="font-size: 10px; color: var(--text-muted);">R$ 15,00/1ªh</small>
+              </button>
+              <button type="button" class="vehicle-btn" onclick="setVehicleCategory(this, 'Moto', 8.00)">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="16" r="3"/><circle cx="19" cy="16" r="3"/><path d="M12 16l-3-6 4-3h4l2 4"/></svg>
                 <span>Motocicleta</span>
-              </div>
-              <div class="vehicle-type-btn" onclick="setVehicleType(this, 'SUV/Caminhonete', 'R$ 20,00 / 1ª h')">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="9" width="20" height="10" rx="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/><path d="M4 9l2-5h12l2 5"/></svg>
+                <small style="font-size: 10px; color: var(--text-muted);">R$ 8,00/1ªh</small>
+              </button>
+              <button type="button" class="vehicle-btn" onclick="setVehicleCategory(this, 'SUV', 20.00)">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="9" width="20" height="10" rx="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/><path d="M4 9l2-5h12l2 5"/></svg>
                 <span>SUV / Pickup</span>
-              </div>
+                <small style="font-size: 10px; color: var(--text-muted);">R$ 20,00/1ªh</small>
+              </button>
             </div>
           </div>
 
-          <!-- Auto Spot Selection -->
+          <!-- Suggested Spot -->
           <div class="form-group">
-            <label class="form-label">Vaga Sugerida pelo Sistema</label>
+            <label for="spot-assigned" class="form-label">
+              <span>Vaga Sugerida (Sensor Inteligente)</span>
+              <span style="color: #059669; font-weight: 700;">Setor A (Térreo)</span>
+            </label>
             <div style="display: flex; gap: 8px;">
-              <input type="text" id="suggested-spot" class="form-input" value="A-04 (Térreo Coberto)" readonly style="font-weight: 700; color: #10b981;">
-              <button class="btn btn-secondary" style="width: auto;" onclick="randomizeSpot()">Trocar</button>
+              <input type="text" id="spot-assigned" class="form-control" value="A-04 (Coberta)" readonly style="font-weight: 700; color: #059669;">
+              <button type="button" class="btn btn-secondary" style="width: auto; padding: 0 16px;" onclick="cycleSpot()">Trocar</button>
             </div>
           </div>
 
-          <!-- Convenio / Mensalista -->
+          <!-- Rate / Convenience Agreement -->
           <div class="form-group">
-            <label class="form-label">Tipo de Tarifa / Convênio</label>
-            <select class="form-select" id="input-rate-type">
-              <option value="rotativo">Rotativo Padrão (15m tolerância)</option>
-              <option value="convenio_mercado">Convênio Supermercado (2h Grátis)</option>
-              <option value="convenio_academia">Convênio Academia SmartFit (1h30 Grátis)</option>
-              <option value="mensalista">Mensalista Credenciado (Acesso Livre)</option>
+            <label for="rate-select" class="form-label">Tabela de Tarifa / Convênio</label>
+            <select id="rate-select" class="form-control">
+              <option value="padrao">Rotativo Padrão (15 min tolerância)</option>
+              <option value="mercado">Convênio Pão de Açúcar (2h Isento)</option>
+              <option value="academia">Convênio SmartFit (1h30 Isento)</option>
+              <option value="mensalista">Mensalista Credenciado (Livre)</option>
             </select>
           </div>
 
           <!-- Action Button -->
-          <button class="btn btn-primary" onclick="generateTicket()">
+          <button type="button" class="btn btn-primary" onclick="confirmCheckin()">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
             Imprimir Ticket & Abrir Cancela
+            <span class="shortcut-badge">ENTER</span>
           </button>
         </div>
 
-        <!-- Recent Entries Live Feed -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              Fluxo Recente de Entradas
-            </div>
-            <span style="font-size: 11px; color: var(--text-muted);">Atualização em Tempo Real</span>
-          </div>
-
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Placa</th>
-                <th>Categoria</th>
-                <th>Vaga</th>
-                <th>Entrada</th>
-                <th>Status</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody id="entries-table-body">
-              <tr>
-                <td><strong style="color: #38bdf8; font-family: monospace;">RJG3B88</strong></td>
-                <td>Toyota Corolla</td>
-                <td><span class="spot-tag" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">A-01</span></td>
-                <td>14:32:10</td>
-                <td><span style="color: #10b981;">Estacionado</span></td>
-                <td><button class="btn btn-secondary" style="padding: 2px 8px; font-size: 11px; width: auto;" onclick="openSpotDetails('A-01', 'RJG3B88', '14:32')">Ver</button></td>
-              </tr>
-              <tr>
-                <td><strong style="color: #38bdf8; font-family: monospace;">PKG9921</strong></td>
-                <td>Honda Civic</td>
-                <td><span class="spot-tag" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">A-02</span></td>
-                <td>14:15:00</td>
-                <td><span style="color: #10b981;">Estacionado</span></td>
-                <td><button class="btn btn-secondary" style="padding: 2px 8px; font-size: 11px; width: auto;" onclick="openSpotDetails('A-02', 'PKG9921', '14:15')">Ver</button></td>
-              </tr>
-              <tr>
-                <td><strong style="color: #38bdf8; font-family: monospace;">ABC4D56</strong></td>
-                <td>Yamaha MT-03</td>
-                <td><span class="spot-tag" style="background: rgba(139, 92, 246, 0.2); color: #a78bfa;">M-01</span></td>
-                <td>13:50:22</td>
-                <td><span style="color: #10b981;">Estacionado</span></td>
-                <td><button class="btn btn-secondary" style="padding: 2px 8px; font-size: 11px; width: auto;" onclick="openSpotDetails('M-01', 'ABC4D56', '13:50')">Ver</button></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- TAB 2: FLOOR MAP -->
-    <section id="view-floor-map" class="view-section">
-      <div class="floor-map-container">
-        <div class="floor-legend">
-          <span style="font-weight: 700; font-size: 13px; color: #fff; margin-right: 12px;">Legenda do Pátio:</span>
-          <div class="legend-item"><div class="legend-dot dot-free"></div> Livre (10)</div>
-          <div class="legend-item"><div class="legend-dot dot-occupied"></div> Ocupada (24)</div>
-          <div class="legend-item"><div class="legend-dot dot-reserved"></div> Tolerância / Saída (2)</div>
-          <div class="legend-item"><div class="legend-dot dot-vip"></div> Mensalista / VIP (2)</div>
+        <!-- Skeleton Loading State Content -->
+        <div id="form-content-skeleton" style="display: none;">
+          <div class="skeleton-box" style="height: 120px; margin-bottom: 20px;"></div>
+          <div class="skeleton-box" style="height: 70px; margin-bottom: 20px;"></div>
+          <div class="skeleton-box" style="height: 44px; margin-bottom: 20px;"></div>
+          <div class="skeleton-box" style="height: 48px;"></div>
         </div>
 
-        <h3 style="font-size: 14px; font-weight: 700; color: #94a3b8; margin: 16px 0 10px;">Setor A — Térreo Coberto (Carros)</h3>
-        <div class="spots-grid">
-          <div class="spot-card occupied" onclick="openSpotDetails('A-01', 'RJG3B88', '14:32')">
-            <div class="spot-header"><span class="spot-code">A-01</span><span class="spot-tag">Ocupada</span></div>
-            <div class="spot-body"><div class="spot-plate">RJG3B88</div><div class="spot-time">Entrada: 14:32 (48m)</div></div>
-            <div class="spot-footer"><span>Corolla</span><span>R$ 15,00</span></div>
+        <!-- Empty State Content -->
+        <div id="form-content-empty" class="empty-state-box" style="display: none;">
+          <div class="empty-state-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
           </div>
-          <div class="spot-card occupied" onclick="openSpotDetails('A-02', 'PKG9921', '14:15')">
-            <div class="spot-header"><span class="spot-code">A-02</span><span class="spot-tag">Ocupada</span></div>
-            <div class="spot-body"><div class="spot-plate">PKG9921</div><div class="spot-time">Entrada: 14:15 (1h05)</div></div>
-            <div class="spot-footer"><span>Civic</span><span>R$ 20,00</span></div>
-          </div>
-          <div class="spot-card occupied" onclick="openSpotDetails('A-03', 'HJU1234', '13:00')">
-            <div class="spot-header"><span class="spot-code">A-03</span><span class="spot-tag">Ocupada</span></div>
-            <div class="spot-body"><div class="spot-plate">HJU1234</div><div class="spot-time">Entrada: 13:00 (2h20)</div></div>
-            <div class="spot-footer"><span>Jeep Compass</span><span>R$ 28,00</span></div>
-          </div>
-          <div class="spot-card free" onclick="selectFreeSpot('A-04')">
-            <div class="spot-header"><span class="spot-code">A-04</span><span class="spot-tag">Livre</span></div>
-            <div class="spot-body"><div class="spot-plate" style="color:#64748b;">DISPONÍVEL</div><div class="spot-time">Sensor Ativo</div></div>
-            <div class="spot-footer"><span>Vaga Coberta</span><span>--</span></div>
-          </div>
-          <div class="spot-card free" onclick="selectFreeSpot('A-05')">
-            <div class="spot-header"><span class="spot-code">A-05</span><span class="spot-tag">Livre</span></div>
-            <div class="spot-body"><div class="spot-plate" style="color:#64748b;">DISPONÍVEL</div><div class="spot-time">Sensor Ativo</div></div>
-            <div class="spot-footer"><span>Vaga Coberta</span><span>--</span></div>
-          </div>
-          <div class="spot-card reserved" onclick="openSpotDetails('A-06', 'ABC9988', '11:20')">
-            <div class="spot-header"><span class="spot-code">A-06</span><span class="spot-tag">Pago</span></div>
-            <div class="spot-body"><div class="spot-plate">ABC9988</div><div class="spot-time">Tolerância Saída (12m)</div></div>
-            <div class="spot-footer"><span>Onix Plus</span><span style="color:#f59e0b;">Liberado</span></div>
-          </div>
+          <h3 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">Nenhum Veículo na Guarita</h3>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Aguardando aproximação de veículo ou leitura do sensor LPR.</p>
+          <button class="btn btn-secondary" style="width: auto; margin: 0 auto;" onclick="setInterfaceState('normal')">Simular Chegada</button>
         </div>
+      </section>
 
-        <h3 style="font-size: 14px; font-weight: 700; color: #94a3b8; margin: 24px 0 10px;">Setor M — Motocicletas</h3>
-        <div class="spots-grid">
-          <div class="spot-card occupied" onclick="openSpotDetails('M-01', 'ABC4D56', '13:50')">
-            <div class="spot-header"><span class="spot-code">M-01</span><span class="spot-tag">Ocupada</span></div>
-            <div class="spot-body"><div class="spot-plate">ABC4D56</div><div class="spot-time">Entrada: 13:50 (1h30)</div></div>
-            <div class="spot-footer"><span>Yamaha MT03</span><span>R$ 12,00</span></div>
-          </div>
-          <div class="spot-card free" onclick="selectFreeSpot('M-02')">
-            <div class="spot-header"><span class="spot-code">M-02</span><span class="spot-tag">Livre</span></div>
-            <div class="spot-body"><div class="spot-plate" style="color:#64748b;">DISPONÍVEL</div><div class="spot-time">Sensor Ativo</div></div>
-            <div class="spot-footer"><span>Moto</span><span>--</span></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- TAB 3: CHECKOUT & CAIXA -->
-    <section id="view-checkout" class="view-section">
-      <div class="grid-2col">
-        <!-- Search & Receipt -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-              Cobrança & Fechamento de Estadia
-            </div>
-            <span class="spot-tag" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">Caixa 01 Aberto</span>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Buscar por Placa ou Nº do Ticket</label>
-            <div style="display: flex; gap: 8px;">
-              <input type="text" id="checkout-search" class="form-input" value="PKG9921" placeholder="Ex: PKG9921 ou #8492" style="font-family: monospace; font-size: 16px; font-weight: 700;">
-              <button class="btn btn-primary" style="width: auto;" onclick="calculateStay()">Calcular</button>
-            </div>
-          </div>
-
-          <!-- Ticket Bill Preview -->
-          <div class="ticket-preview">
-            <div style="text-align: center; margin-bottom: 12px; border-bottom: 1px dashed #475569; padding-bottom: 8px;">
-              <strong style="color: #fff; font-size: 14px;">PARKCONTROL ESTACIONAMENTOS LTDA</strong>
-              <div style="font-size: 11px; color: var(--text-muted);">CNPJ: 12.345.678/0001-90 • Pátio Central</div>
-            </div>
-
-            <div class="receipt-row">
-              <span style="color: var(--text-muted);">Veículo / Placa:</span>
-              <strong style="color: #fff;" id="receipt-plate">PKG9921 (Honda Civic)</strong>
-            </div>
-            <div class="receipt-row">
-              <span style="color: var(--text-muted);">Hora de Entrada:</span>
-              <span id="receipt-entry">14:15:00</span>
-            </div>
-            <div class="receipt-row">
-              <span style="color: var(--text-muted);">Hora Atual (Saída):</span>
-              <span id="receipt-exit">15:20:00</span>
-            </div>
-            <div class="receipt-row">
-              <span style="color: var(--text-muted);">Tempo Total:</span>
-              <strong style="color: #38bdf8;" id="receipt-duration">1 hora e 05 minutos</strong>
-            </div>
-            <div class="receipt-row">
-              <span style="color: var(--text-muted);">Tarifa Aplicada:</span>
-              <span>1ª Hora (R$ 15,00) + 1 Fração (R$ 5,00)</span>
-            </div>
-            <div class="receipt-row total">
-              <span>TOTAL A COBRAR:</span>
-              <span id="receipt-total">R$ 20,00</span>
-            </div>
-          </div>
-
-          <!-- Payment Methods -->
-          <label class="form-label">Forma de Pagamento</label>
-          <div class="payment-methods">
-            <div class="pay-btn active" onclick="setPaymentMethod(this, 'PIX Instantâneo')">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-              <span>PIX (QR Code)</span>
-            </div>
-            <div class="pay-btn" onclick="setPaymentMethod(this, 'Cartão Débito/Crédito')">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-              <span>Cartão</span>
-            </div>
-            <div class="pay-btn" onclick="setPaymentMethod(this, 'Dinheiro')">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-              <span>Dinheiro</span>
-            </div>
-          </div>
-
-          <button class="btn btn-success" onclick="processPayment()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-            Confirmar Pagamento & Liberar Saída (15m Tolerância)
-          </button>
-        </div>
-
-        <!-- QR Code Display / Validation -->
-        <div class="card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
-          <div class="card-header" style="width: 100%;">
-            <div class="card-title">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h.01"/><path d="M17 7h.01"/><path d="M7 17h.01"/></svg>
-              PIX Dinâmico — Pague no Smartphone
-            </div>
-          </div>
-
-          <!-- Dynamic QR Code SVG -->
-          <div style="background: #ffffff; padding: 16px; border-radius: 12px; margin: 16px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
-            <svg width="180" height="180" viewBox="0 0 100 100" fill="#000000">
-              <path d="M0,0 h30 v30 h-30 z M5,5 v20 h20 v-20 z M10,10 h10 v10 h-10 z" />
-              <path d="M70,0 h30 v30 h-30 z M75,5 v20 h20 v-20 z M80,10 h10 v10 h-10 z" />
-              <path d="M0,70 h30 v30 h-30 z M5,75 v20 h20 v-20 z M10,80 h10 v10 h-10 z" />
-              <rect x="35" y="10" width="10" height="10"/>
-              <rect x="50" y="5" width="15" height="10"/>
-              <rect x="35" y="35" width="30" height="30"/>
-              <rect x="15" y="45" width="10" height="15"/>
-              <rect x="75" y="40" width="15" height="20"/>
-              <rect x="40" y="75" width="15" height="15"/>
-              <rect x="65" y="75" width="25" height="20"/>
-            </svg>
-          </div>
-
-          <div style="font-size: 16px; font-weight: 800; color: #10b981; margin-bottom: 4px;">Valor: R$ 20,00</div>
-          <p style="font-size: 12px; color: var(--text-muted); max-width: 280px;">
-            Aponte o app do banco para pagar. A cancela de saída será liberada automaticamente na leitura da placa pela câmera de saída.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- TAB 4: REPORTS & FINANCIAL -->
-    <section id="view-reports" class="view-section">
-      <div class="grid-4kpi">
-        <div class="card">
-          <div class="kpi-label">Faturamento Total Hoje</div>
-          <div class="kpi-value" style="font-size: 24px; color: #10b981; margin-top: 6px;">R$ 1.845,50</div>
-          <div style="font-size: 11px; color: #34d399; margin-top: 4px;">+18.4% vs dia anterior</div>
-        </div>
-        <div class="card">
-          <div class="kpi-label">Veículos Atendidos</div>
-          <div class="kpi-value" style="font-size: 24px; color: #38bdf8; margin-top: 6px;">112</div>
-          <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Giro de 2.9 carros/vaga</div>
-        </div>
-        <div class="card">
-          <div class="kpi-label">Ticket Médio</div>
-          <div class="kpi-value" style="font-size: 24px; color: #f59e0b; margin-top: 6px;">R$ 16,48</div>
-          <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Tempo médio: 1h12m</div>
-        </div>
-        <div class="card">
-          <div class="kpi-label">Mensalistas Ativos</div>
-          <div class="kpi-value" style="font-size: 24px; color: #a78bfa; margin-top: 6px;">18</div>
-          <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">100% adimplentes</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-            Relatório de Turno & Fechamento de Caixa
-          </div>
-          <button class="btn btn-secondary" style="width: auto; padding: 4px 12px; font-size: 11px;" onclick="showToast('Relatório Fiscal PDF gerado e enviado para a contabilidade!')">Exportar PDF</button>
-        </div>
-
-        <div style="display: flex; gap: 20px; align-items: center; justify-content: space-between; padding: 12px 0;">
+      <!-- RIGHT COLUMN: 2D PARKING FLOOR MAP -->
+      <section class="card" aria-labelledby="map-title">
+        <div class="map-header">
           <div>
-            <div style="font-size: 13px; font-weight: 700; color: #fff;">Operador Atual: Carlos Eduardo (Turno Tarde: 12h - 18h)</div>
-            <div style="font-size: 12px; color: var(--text-muted);">Abertura: R$ 150,00 (Fundo de Troco) • Saldo em Caixa Dinheiro: R$ 420,00 • Cartões/PIX: R$ 1.425,50</div>
+            <h2 id="map-title" class="card-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+              Mapa de Vagas em Tempo Real
+            </h2>
+            <div style="font-size: 12px; color: var(--text-muted);">Clique em qualquer vaga para inspecionar estadia ou realizar cobrança</div>
           </div>
-          <button class="btn btn-primary" style="width: auto;" onclick="showToast('Caixa do Turno encerrado com sucesso! Saldo consolidado.')">
-            Realizar Fechamento de Turno
-          </button>
-        </div>
-      </div>
-    </section>
 
+          <div class="map-legend">
+            <div class="legend-tag"><div class="legend-pill" style="background: #059669;"></div> Livre (10)</div>
+            <div class="legend-tag"><div class="legend-pill" style="background: #dc2626;"></div> Ocupada (24)</div>
+            <div class="legend-tag"><div class="legend-pill" style="background: #d97706;"></div> Tolerância (2)</div>
+            <div class="legend-tag"><div class="legend-pill" style="background: #7c3aed;"></div> VIP (2)</div>
+          </div>
+        </div>
+
+        <!-- Normal State Grid -->
+        <div id="grid-content-normal">
+          <div style="font-size: 13px; font-weight: 700; color: var(--text-secondary); margin: 12px 0 8px;">Setor A — Térreo Coberto</div>
+          <div class="grid-spots">
+            <div class="spot-tile occupied" onclick="inspectSpot('A-01', 'RJG3B88', 'Corolla', '14:32', 'R$ 15,00')">
+              <div style="display: flex; justify-content: space-between;"><span class="spot-code">A-01</span><span class="spot-status-badge">Ocupada</span></div>
+              <div class="spot-plate-text">RJG3B88</div>
+              <div class="spot-subtext">14:32 • 48 min</div>
+            </div>
+
+            <div class="spot-tile occupied" onclick="inspectSpot('A-02', 'PKG9921', 'Civic', '14:15', 'R$ 20,00')">
+              <div style="display: flex; justify-content: space-between;"><span class="spot-code">A-02</span><span class="spot-status-badge">Ocupada</span></div>
+              <div class="spot-plate-text">PKG9921</div>
+              <div class="spot-subtext">14:15 • 1h05</div>
+            </div>
+
+            <div class="spot-tile occupied" onclick="inspectSpot('A-03', 'HJU1234', 'Jeep Compass', '13:00', 'R$ 28,00')">
+              <div style="display: flex; justify-content: space-between;"><span class="spot-code">A-03</span><span class="spot-status-badge">Ocupada</span></div>
+              <div class="spot-plate-text">HJU1234</div>
+              <div class="spot-subtext">13:00 • 2h20</div>
+            </div>
+
+            <div class="spot-tile free" onclick="selectSpotDirectly('A-04')">
+              <div style="display: flex; justify-content: space-between;"><span class="spot-code">A-04</span><span class="spot-status-badge">Livre</span></div>
+              <div class="spot-plate-text" style="color: #059669;">LIVRE</div>
+              <div class="spot-subtext">Sensor Ativo</div>
+            </div>
+
+            <div class="spot-tile free" onclick="selectSpotDirectly('A-05')">
+              <div style="display: flex; justify-content: space-between;"><span class="spot-code">A-05</span><span class="spot-status-badge">Livre</span></div>
+              <div class="spot-plate-text" style="color: #059669;">LIVRE</div>
+              <div class="spot-subtext">Sensor Ativo</div>
+            </div>
+
+            <div class="spot-tile reserved" onclick="inspectSpot('A-06', 'ABC9988', 'Onix', '11:20', 'Pago')">
+              <div style="display: flex; justify-content: space-between;"><span class="spot-code">A-06</span><span class="spot-status-badge">Pago</span></div>
+              <div class="spot-plate-text">ABC9988</div>
+              <div class="spot-subtext">Saída em 12m</div>
+            </div>
+          </div>
+
+          <div style="font-size: 13px; font-weight: 700; color: var(--text-secondary); margin: 20px 0 8px;">Setor M — Motocicletas</div>
+          <div class="grid-spots">
+            <div class="spot-tile occupied" onclick="inspectSpot('M-01', 'ABC4D56', 'Yamaha MT-03', '13:50', 'R$ 12,00')">
+              <div style="display: flex; justify-content: space-between;"><span class="spot-code">M-01</span><span class="spot-status-badge">Ocupada</span></div>
+              <div class="spot-plate-text">ABC4D56</div>
+              <div class="spot-subtext">13:50 • 1h30</div>
+            </div>
+
+            <div class="spot-tile free" onclick="selectSpotDirectly('M-02')">
+              <div style="display: flex; justify-content: space-between;"><span class="spot-code">M-02</span><span class="spot-status-badge">Livre</span></div>
+              <div class="spot-plate-text" style="color: #059669;">LIVRE</div>
+              <div class="spot-subtext">Moto</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Skeleton Grid -->
+        <div id="grid-content-skeleton" class="grid-spots" style="display: none; margin-top: 16px;">
+          <div class="skeleton-box" style="height: 105px;"></div>
+          <div class="skeleton-box" style="height: 105px;"></div>
+          <div class="skeleton-box" style="height: 105px;"></div>
+          <div class="skeleton-box" style="height: 105px;"></div>
+          <div class="skeleton-box" style="height: 105px;"></div>
+          <div class="skeleton-box" style="height: 105px;"></div>
+        </div>
+
+        <!-- Empty Grid -->
+        <div id="grid-content-empty" class="empty-state-box" style="display: none;">
+          <div class="empty-state-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/></svg>
+          </div>
+          <h3 style="font-size: 15px; font-weight: 700;">Estacionamento Vazio</h3>
+          <p style="font-size: 13px; color: var(--text-muted);">Todas as 38 vagas estão 100% disponíveis.</p>
+        </div>
+      </section>
+
+    </div>
   </main>
 
-  <!-- Interactive JavaScript Logic -->
+  <!-- Interactive Logic & Shortcuts -->
   <script>
-    function switchTab(tabId) {
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+    // 4 Interface States Handler
+    function setInterfaceState(state) {
+      document.querySelectorAll('.state-pill').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
 
-      event.currentTarget.classList.add('active');
-      document.getElementById('view-' + tabId).classList.add('active');
+      const normalForm = document.getElementById('form-content-normal');
+      const skeletonForm = document.getElementById('form-content-skeleton');
+      const emptyForm = document.getElementById('form-content-empty');
+
+      const normalGrid = document.getElementById('grid-content-normal');
+      const skeletonGrid = document.getElementById('grid-content-skeleton');
+      const emptyGrid = document.getElementById('grid-content-empty');
+
+      const errorBanner = document.getElementById('state-error-banner');
+
+      // Reset
+      normalForm.style.display = 'none';
+      skeletonForm.style.display = 'none';
+      emptyForm.style.display = 'none';
+
+      normalGrid.style.display = 'none';
+      skeletonGrid.style.display = 'none';
+      emptyGrid.style.display = 'none';
+      errorBanner.style.display = 'none';
+
+      if (state === 'normal') {
+        normalForm.style.display = 'block';
+        normalGrid.style.display = 'block';
+        showToast('🟢 Modo Operacional Normal Ativado');
+      } else if (state === 'loading') {
+        skeletonForm.style.display = 'block';
+        skeletonGrid.style.display = 'grid';
+        showToast('⏳ Estado de Loading com Skeletons Shimmer');
+      } else if (state === 'empty') {
+        emptyForm.style.display = 'block';
+        emptyGrid.style.display = 'block';
+        showToast('📭 Empty State Ilustrado Ativado');
+      } else if (state === 'error') {
+        normalForm.style.display = 'block';
+        normalGrid.style.display = 'block';
+        errorBanner.style.display = 'flex';
+        showToast('⚠️ Estado de Alerta/Erro Exibido');
+      }
     }
 
-    function setVehicleType(el, type, rate) {
-      document.querySelectorAll('.vehicle-type-btn').forEach(b => b.classList.remove('active'));
+    function setVehicleCategory(el, cat, rate) {
+      document.querySelectorAll('.vehicle-btn').forEach(b => b.classList.remove('active'));
       el.classList.add('active');
-      showToast(`Categoria selecionada: ${type} (${rate})`);
+      showToast(`Categoria selecionada: ${cat}`);
     }
 
-    function setPaymentMethod(el, method) {
-      document.querySelectorAll('.pay-btn').forEach(b => b.classList.remove('active'));
-      el.classList.add('active');
-      showToast(`Forma de pagamento definida: ${method}`);
-    }
-
-    function randomizeSpot() {
-      const spots = ['A-04', 'A-05', 'B-02', 'B-03', 'M-02'];
+    function cycleSpot() {
+      const spots = ['A-04 (Coberta)', 'A-05 (Coberta)', 'B-01 (Descoberta)', 'M-02 (Moto)'];
       const pick = spots[Math.floor(Math.random() * spots.length)];
-      document.getElementById('suggested-spot').value = `${pick} (Disponível)`;
+      document.getElementById('spot-assigned').value = pick;
+      showToast(`Nova vaga atribuída: ${pick}`);
     }
 
-    function generateTicket() {
-      const plate = document.getElementById('input-plate').value || 'ABC1D23';
-      const spot = document.getElementById('suggested-spot').value.split(' ')[0];
-      
-      const tbody = document.getElementById('entries-table-body');
-      const now = new Date().toLocaleTimeString('pt-BR');
-      
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td><strong style="color: #38bdf8; font-family: monospace;">${plate}</strong></td>
-        <td>Automóvel</td>
-        <td><span class="spot-tag" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">${spot}</span></td>
-        <td>${now}</td>
-        <td><span style="color: #10b981;">Entrada Liberada</span></td>
-        <td><button class="btn btn-secondary" style="padding: 2px 8px; font-size: 11px; width: auto;" onclick="openSpotDetails('${spot}', '${plate}', '${now}')">Ver</button></td>
-      `;
-      tbody.prepend(row);
-
-      showToast(`Ticket emitido para ${plate} na vaga ${spot}! Cancela de entrada aberta.`);
+    function selectSpotDirectly(spot) {
+      document.getElementById('spot-assigned').value = `${spot} (Selecionada no Mapa)`;
+      showToast(`Vaga ${spot} selecionada para o veículo na guarita.`);
     }
 
-    function selectFreeSpot(spotCode) {
-      document.getElementById('suggested-spot').value = `${spotCode} (Selecionada no Mapa)`;
-      showToast(`Vaga ${spotCode} selecionada para a próxima entrada!`);
-      // switch to checkin tab
-      document.querySelectorAll('.tab-btn')[0].click();
+    function inspectSpot(spot, plate, model, time, bill) {
+      showToast(`Veículo ${plate} (${model}) na vaga ${spot}. Entrada: ${time} • Total: ${bill}`);
     }
 
-    function openSpotDetails(spot, plate, time) {
-      document.getElementById('checkout-search').value = plate;
-      calculateStay();
-      // switch to checkout tab
-      document.querySelectorAll('.tab-btn')[2].click();
+    function confirmCheckin() {
+      const plate = document.getElementById('plate-input').value || 'ABC1D23';
+      const spot = document.getElementById('spot-assigned').value.split(' ')[0];
+      showToast(`✅ Ticket emitido para ${plate} na vaga ${spot}! Cancela liberada.`);
     }
 
-    function calculateStay() {
-      const search = document.getElementById('checkout-search').value.toUpperCase();
-      document.getElementById('receipt-plate').innerText = search + ' (Identificado)';
-      showToast(`Estadia de ${search} calculada com sucesso.`);
-    }
-
-    function processPayment() {
-      const plate = document.getElementById('receipt-plate').innerText.split(' ')[0];
-      showToast(`Pagamento de R$ 20,00 confirmado para ${plate}! 15 min de tolerância para saída.`);
-      
-      // Update revenue counter
-      const currentRev = parseFloat(document.getElementById('header-revenue').innerText.replace('.', '').replace(',', '.'));
-      const newRev = (currentRev + 20).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-      document.getElementById('header-revenue').innerText = newRev;
-    }
+    // Keyboard Shortcuts (F2 / Enter)
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'F2') {
+        e.preventDefault();
+        document.getElementById('plate-input').focus();
+        showToast('Atalho [F2]: Foco no campo de placa');
+      } else if (e.key === 'Enter' && document.activeElement === document.getElementById('plate-input')) {
+        confirmCheckin();
+      }
+    });
 
     function showToast(msg) {
-      const existing = document.querySelector('.toast-success');
+      const existing = document.querySelector('.toast-box');
       if (existing) existing.remove();
 
       const toast = document.createElement('div');
-      toast.className = 'toast-success';
+      toast.className = 'toast-box';
       toast.innerHTML = `
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
         <span>${msg}</span>
       `;
       document.body.appendChild(toast);
 
-      setTimeout(() => {
-        toast.remove();
-      }, 3500);
+      setTimeout(() => toast.remove(), 3200);
     }
   </script>
 </body>
